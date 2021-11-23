@@ -1,182 +1,55 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+	 <!--[if lte IE 8]>
+	     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
+	 <![endif]-->
+	</head>
+  <body>
 
-    <head>
-        <meta charset="utf-8">
-        <title>Gluten-Free Map</title>
-        <base target="_blank">
-        <meta name="viewport" content="initial-scale=1.0">
-        <link rel="stylesheet" href="https://unpkg.com/primer-tooltips@1.5.7/build/build.css">
-        <link rel="stylesheet" href="css/style.css">
-        
-        <!-- Favicon stuff -->
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-        <link rel="manifest" href="/icons/site.webmanifest">
-        <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#5bbad5">
-        <link rel="shortcut icon" href="/icons/favicon.ico">
-        <meta name="msapplication-TileColor" content="#00aba9">
-        <meta name="msapplication-config" content="/icons/browserconfig.xml">
-        <meta name="theme-color" content="#ffffff">
-        <!-- End favicon stuff -->
-    </head>
+				<!--
+					This example uses:
+						Leaflet
+						Custom icons from spreadsheet
+						markerOptions to set the icons in the right places
+						Handlebars templating for popups
+				-->
 
-    <body>
-        <div id="map"></div>
+    <div id="map" style="height: 500px; width: 600px"></div>
 
-       
-       <div id="toggles">
-            <div onclick="toggleAbout()" class="tooltipped tooltipped-sw" aria-label="[Shift] View help and credits">?</div>
-            <div onclick="toggleSearch()" class="tooltipped tooltipped-sw" aria-label="[S] Open Search/Filter Menu">S</div>
-            <div onclick="toggleMarkers('team')" class="tooltipped tooltipped-sw" aria-label="[T] Toggle Team Markers">T</div>
-            <div onclick="toggleMarkers('district')" class="tooltipped tooltipped-sw" aria-label="[D] Toggle District Markers">D</div>
-            <div onclick="toggleMarkers('regional')" class="tooltipped tooltipped-sw" aria-label="[R] Toggle Regional Markers">R</div>
-            <div onclick="toggleMarkers('offseason')" class="tooltipped tooltipped-sw" aria-label="[O] Toggle Offseason & Preseason Markers">O</div>
-            <div onclick="toggleMarkers('championship')" class="tooltipped tooltipped-sw" aria-label="[C] Toggle Championship Markers">C</div>
-            <div onclick="toggleMapFullscreen()" id="fullscreen-controls" class="tooltipped tooltipped-sw" aria-label="[F] Toggle Fullscreen">&nbsp;</div>
-        </div>
+    <script type="text/javascript" src="common/tabletop.js"></script>
+    <script type="text/javascript" src="common/handlebars.js"></script>
+		<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
 
-        <div id="about">
-            <h2 class="stripe">About</h2>
+    <script type="text/javascript" src="../src/mapsheet.js"></script>
 
-            <h3>Controls</h3>
-            <table id="controls">
-                <tbody>
+    <script id="popup-template" type="text/x-handlebars-template">
+			<h3><a href='{{link}}' target='_blank'>{{name}}</a></h3>
+			<p>{{borough}}</p>
+			<p>{{streetaddress}}</p>
+			<p>{{type}}</p>
+			<p><a href='{{link}}' target='_blank'>{{link}}</a></p>
+    </script>
 
-                    <tr>
-                        <td>T</td>
-                        <td>Toggle Teams<img src="img/team.png"></td>
-                    </tr>
-                    <tr>
-                        <td>D</td>
-                        <td>Toggle District Events <img src="img/district.png"></td>
-                    </tr>
-                    <tr>
-                        <td>R</td>
-                        <td>Toggle Regional Events <img src="img/regional.png"></td>
-                    </tr>
-                    <tr>
-                        <td>O</td>
-                        <td>Toggle Offseason & Preseason Events <img src="img/offseason.png"></td>
-                    </tr>
-                    <tr>
-                        <td>C</td>
-                        <td>Toggle Championship Events <img src="img/championship.png"></td>
-                    </tr>
-                    <tr>
-                        <td>S</td>
-                        <td>Open Search/Filter Menu</td>
-                    </tr>
-                    <tr>
-                        <td>?</td>
-                        <td>View Help and Credits</td>
-                    </tr>
-                    <tr>
-                        <td>+/-</td>
-                        <td>Zoom into/out of map at window center</td>
-                    </tr>
-                    <tr>
-                        <td>Scroll</td>
-                        <td>Zoom into/out of map at mouse location</td>
-                    </tr>
-                </tbody>
-            </table>
+    <script type="text/javascript">
+    	window.onload = function() { init() };
 
-            <div id="toggle-logos">
-                <div class="on" onclick="toggleLogos()">
-                    <p class="main"><span id="logos-off">Enable</span><span id="logos-on">Disable</span> Custom Team Logos?</p>
-                    <p class="sub">(Reloads Page)</p>
-                </div>
-            </div>
+      var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQy0i_dg_3dI-DiIC-63Q0J4VLMxPa70vOpxRe--7NWLvt9KWIWOlnn-ZL1jA4XxcLT8-3OFkPN9KPl/pubhtml';
+			
+      function init() {
+        Mapsheet( { key: public_spreadsheet_url,
+											element: "map",
+											popupTemplate: "popup-template",
+											provider: Mapsheet.Providers.Leaflet,
+											markerOptions: {
+										    iconSize:   [32, 37], 
+										    iconAnchor:   [16, 37]
+											}
+				});
+      }
 
-            <div id="development">
-                <h3>Developed using:</h3>
-                <table id="tools">
-                    <tbody>
-                        <tr>
-                            <td><a href="https://pages.github.com">GitHub Pages</a></td>
-                            <td>Hosting</td>
-                        </tr>
-                        <tr>
-                            <td><a href="https://maps.google.com">Google Maps</a></td>
-                            <td>Map interface and some team locations</td>
-                        </tr>
-                        <tr>
-                            <td><a href="https://www.thebluealliance.com">The Blue Alliance</a></td>
-                            <td>FRC Team and competition info</td>
-                        </tr>
-                        <tr>
-                            <td><a href="http://www.geonames.org">GeoNames</a></td>
-                            <td>Team locations</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <h3><a href="https://github.com/FIRSTMap/firstmap.github.io">View or edit FIRSTMap on GitHub!</a></h3>
-            </div>
-        </div>
-
-        <div id="search">
-            <h2 class="stripe">Search</h2>
-
-            <div id="search-section" hidden>
-                <h3>Search</h3>
-                <div id="team-search">
-                    <input type="search" id="team-search-input">
-                    <button id="search-btn">Search</button>
-                </div>
-
-                <div id="event-search" hidden>
-                    <input type="search" id="event-search-input">
-                    
-                    <ul id="event-search-list">
-                    </ul>
-                </div>
-
-                <select id="search-type">
-                    <option value="team">Team</option>
-                    <option value="event">Event</option>
-                </select>
-                <br>
-                <h6 id="search-info-text"></h6>
-            </div>
-
-            <div id="filter-section" hidden>
-                <h3>Filter</h3>
-                <div id="team-filter">
-                    <input type="search" id="filter-input-teams">
-                    <button id="filter-btn">Filter</button>
-                </div>
-
-                <div id="event-district-filter" hidden>
-                    <input type="search" id="filter-input-other">
-                    
-                    <ul id="filter-input-list">
-                    </ul>
-                </div>
-                
-                <select id="filter-type">
-                    <option value="team">Team</option>
-                    <option value="event">Event</option>
-                    <option value="district">District</option>
-                </select>
-                <br>
-                <button id="clear-filter-btn">Clear Filter</button>
-                <h6 id="filter-info-text"></h6>
-                <br>
-                <h6>
-                    Note: toggle keys do not work in this menu (e.g., pressing 't' on the keyboard
-                    will not toggle team marker visibility, but pressing the toggle button at the
-                    top of the map still works).
-                </h6>
-            </div>
-        </div>
-
-        <script src="js/tba_getter.js"></script>
-        <script src="js/search.js"></script>
-        <script src="js/searchable_select.js"></script>
-        <script src="js/scripts.js"></script>
-        <script src="https://unpkg.com/clipboard@2.0.0/dist/clipboard.min.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1FQ56PS2iSZmeWE3mhUONtk9YqnAC9mg&callback=initMap" async defer></script>
-    </body>
-</html>
+      document.write("The published spreadsheet is located at <a target='_new' href='" + public_spreadsheet_url + "'>" + public_spreadsheet_url + "</a>");        
+    </script>
+  </body>
+</html
